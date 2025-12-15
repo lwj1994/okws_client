@@ -1,4 +1,4 @@
-## 1.0.0
+## 0.1.0
 
 - Initial release of `okws_client`.
 - Robust reconnection logic with configurable backoff strategies (`LinearBackoff`, `ExponentialBackoff`).
