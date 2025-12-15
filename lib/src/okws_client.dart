@@ -307,7 +307,7 @@ class OkWsClient {
       _heartbeatTimeoutTimer = Timer(heartbeat!.timeout, () async {
         wslog('Heartbeat timeout! Disconnecting...');
         _isExpectedDisconnect = false;
-        disconnect();
+        _handleDisconnect();
       });
     } catch (e) {
       wslog('Error sending heartbeat: $e');
