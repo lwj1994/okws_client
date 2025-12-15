@@ -199,7 +199,7 @@ class OkWsClient {
   }
 
   /// Send a message to the server.
-  /// [message] can be a String or List<int> (bytes).
+  /// [message] can be a String or `List<int>` (bytes).
   /// Returns [true] if sent successfully (or queued), [false] if dropped/failed.
   /// If disconnected, waits up to 5 seconds for reconnection before dropping.
   Future<bool> send(dynamic message) async {

@@ -6,7 +6,7 @@ class OkWsHeartbeat {
   /// The timeout to wait for a response before considering the connection dead.
   final Duration timeout;
 
-  /// The message to send as a heartbeat (String or List<int>).
+  /// The message to send as a heartbeat (String or `List<int>`).
   final dynamic request;
 
   /// Optional validator to identify the heartbeat response.
@@ -14,7 +14,7 @@ class OkWsHeartbeat {
   /// If not provided, ANY message received from the server will reset the timer (keep-alive mode).
   final bool Function(dynamic message)? validator;
 
-  /// Whether to prevent the heartbeat response from being emitted to [OkWsClient.onReceive].
+  /// Whether to prevent the heartbeat response from being emitted to `OkWsClient.onReceive`.
   /// Default is true (consume the pong message).
   final bool interceptResponse;
 
