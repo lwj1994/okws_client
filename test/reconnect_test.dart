@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:okws_client/okws_client.dart';
-import 'package:okws_client/src/backoff_strategy.dart';
 import 'package:test/test.dart';
 
 void main() {

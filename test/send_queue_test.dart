@@ -16,7 +16,7 @@ void main() {
       // Start client first (will fail to connect initially)
       OkWsClient.init(isLoggingEnable: true);
       final client = OkWsClient(wsUrl);
-      
+
       // Start connecting (will fail)
       final connectFuture = client.connect();
 
@@ -54,7 +54,7 @@ void main() {
       // Client to non-existent server
       OkWsClient.init(isLoggingEnable: true);
       final client = OkWsClient('ws://localhost:9999'); // Invalid port
-      
+
       client.connect(); // Will keep failing
 
       print('Sending message that should timeout...');

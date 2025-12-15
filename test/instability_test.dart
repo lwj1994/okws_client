@@ -7,8 +7,8 @@ import 'package:test/test.dart';
 
 void main() {
   HttpServer? server;
-  final int port = 8083;
-  final String wsUrl = 'ws://localhost:$port';
+  int port = 8083;
+  String wsUrl = 'ws://localhost:$port';
   final List<WebSocket> connectedSockets = [];
 
   // Helper to start the server
@@ -16,6 +16,13 @@ void main() {
     // If server is already running, do nothing or maybe throw?
     // For this test we assume we call start after stop.
     if (server != null) return;
+
+    if (port == 8083) {
+      final temp = await HttpServer.bind('localhost', 0);
+      port = temp.port;
+      wsUrl = 'ws://localhost:$port';
+      await temp.close();
+    }
 
     try {
       server = await HttpServer.bind('localhost', port);

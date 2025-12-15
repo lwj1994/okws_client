@@ -59,13 +59,13 @@ void main() {
 
       // Wait for heartbeat interval + verify
       await Future.delayed(Duration(milliseconds: 1500));
-      
+
       // Client should still be connected
       expect(client.state, equals(SocketState.connected));
-      
+
       // Should NOT have received pong in the stream
       expect(receivedPong, isFalse);
-      
+
       client.dispose();
     });
 
@@ -74,10 +74,10 @@ void main() {
       final silentPort = 8086;
       final silentServer = await HttpServer.bind('localhost', silentPort);
       silentServer.listen((HttpRequest request) {
-         if (WebSocketTransformer.isUpgradeRequest(request)) {
+        if (WebSocketTransformer.isUpgradeRequest(request)) {
           WebSocketTransformer.upgrade(request).then((socket) {
-             // Do nothing on message
-             socket.listen((_) {});
+            // Do nothing on message
+            socket.listen((_) {});
           });
         }
       });
@@ -91,7 +91,7 @@ void main() {
           validator: (msg) => msg == 'pong',
         ),
       );
-      
+
       final states = <SocketState>[];
       client.onStateChange.listen(states.add);
 
@@ -103,7 +103,10 @@ void main() {
 
       // Should have disconnected and tried to reconnect
       expect(states, contains(SocketState.disconnected));
-      expect(client.state, isNot(equals(SocketState.connected))); // It might be connecting or disconnected
+      expect(
+          client.state,
+          isNot(equals(SocketState
+              .connected))); // It might be connecting or disconnected
 
       client.dispose();
       await silentServer.close(force: true);

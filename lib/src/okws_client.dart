@@ -48,6 +48,7 @@ class OkWsClient {
 
   Timer? _heartbeatTimer;
   Timer? _heartbeatTimeoutTimer;
+  Timer? _reconnectTimer;
 
   /// Constructor
   /// [url]: The WebSocket server URL.
@@ -115,6 +116,14 @@ class OkWsClient {
         customHttpClient: customHttpClient,
       );
 
+      // Check if we were disconnected while waiting for connection
+      if (_isExpectedDisconnect) {
+        wslog('Connected but expected disconnect. Closing immediately.');
+        _socket?.close();
+        _socket = null;
+        return;
+      }
+
       wslog('Connected to $url');
       _updateState(SocketState.connected);
       _isReconnecting = false;
@@ -173,7 +182,9 @@ class OkWsClient {
           'Reconnecting in ${delay.inMilliseconds}ms (attempt $_reconnectAttempts)...');
 
       // Wait for the interval before reconnecting
-      Timer(delay, () {
+      _reconnectTimer?.cancel();
+      _reconnectTimer = Timer(delay, () {
+        _reconnectTimer = null;
         // Double check if we should still reconnect
         if (!_isExpectedDisconnect) {
           _connectInternal();
@@ -185,17 +196,21 @@ class OkWsClient {
   }
 
   /// Disconnect from the server.
-  void disconnect() {
+  Future<void> disconnect() async {
     wslog('Disconnecting manually...');
+    _reconnectTimer?.cancel();
+    _reconnectTimer = null;
     _isExpectedDisconnect = true;
     _isReconnecting = false;
+    _updateState(SocketState.disconnected);
     try {
-      _socket?.close();
+      await _socket?.close().timeout(const Duration(seconds: 5), onTimeout: () {
+        wslog('Socket close timeout after 5s.');
+      });
     } catch (e) {
       wslog('Error closing socket: $e');
     }
     _socket = null;
-    _updateState(SocketState.disconnected);
   }
 
   /// Send a message to the server.
@@ -203,6 +218,8 @@ class OkWsClient {
   /// Returns [true] if sent successfully (or queued), [false] if dropped/failed.
   /// If disconnected, waits up to 5 seconds for reconnection before dropping.
   Future<bool> send(dynamic message) async {
+    if (_stateController.isClosed) return false;
+
     if (_currentState == SocketState.connected && _socket != null) {
       try {
         if (message is String || message is List<int>) {
@@ -287,13 +304,10 @@ class OkWsClient {
 
       // Start timeout timer
       _heartbeatTimeoutTimer?.cancel();
-      _heartbeatTimeoutTimer = Timer(heartbeat!.timeout, () {
+      _heartbeatTimeoutTimer = Timer(heartbeat!.timeout, () async {
         wslog('Heartbeat timeout! Disconnecting...');
-        // Force disconnect to trigger reconnection logic
-        _socket?.close();
-        // We trigger manual disconnect logic but pretend it's accidental
         _isExpectedDisconnect = false;
-        _handleDisconnect();
+        disconnect();
       });
     } catch (e) {
       wslog('Error sending heartbeat: $e');

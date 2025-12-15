@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:async';
 
 void wslog(Object? message) {
   print('[${DateTime.now()}] $message');

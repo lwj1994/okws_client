@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:okws_client/src/backoff_strategy.dart';
 import 'package:test/test.dart';
 
