@@ -1,6 +1,8 @@
 name: okws_client
 description: A simplified WebSocket client with robust reconnection handling, supporting custom headers, ping interval, and backoff strategies.
 version: 1.0.0
+homepage: https://github.com/example/okws_client
+repository: https://github.com/example/okws_client
 environment:
   sdk: ^3.0.0
 
